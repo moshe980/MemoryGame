@@ -1,7 +1,6 @@
 package com.gini_apps.memorygame.model
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.gini_apps.memorygame.MyApplication.Companion.appContext
 import com.gini_apps.memorygame.model.entity.User
 import com.google.gson.Gson
@@ -30,6 +29,13 @@ class UserSpRepository : UserDao {
         val tmpUsers = mutableSetOf<String>()
         sharedPreference?.getStringSet(tableName, null)?.let { tmpUsers.addAll(it) }
         return tmpUsers
+    }
+
+    override fun clear() {
+        val editor = sharedPreference?.edit()
+        editor?.clear()
+        editor?.apply()
+
     }
 
 }

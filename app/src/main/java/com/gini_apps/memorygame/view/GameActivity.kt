@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.app.Dialog
+import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.*
 import android.os.Bundle
@@ -15,15 +16,15 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.ViewModelProvider
 import com.example.memorygame.R
 import com.example.memorygame.databinding.ActivityGameBinding
+import com.gini_apps.memorygame.Network
 import com.gini_apps.memorygame.model.entity.User
 import com.gini_apps.memorygame.viewModel.GameViewModel
 import com.gini_apps.memorygame.viewModel.MyViewModelFactory
 import com.gini_apps.memorygame.viewModel.TopTenViewModel
-import java.security.AccessController.getContext
+
 
 class GameActivity : AppCompatActivity() {
     private var _binding: ActivityGameBinding? = null
@@ -46,18 +47,14 @@ class GameActivity : AppCompatActivity() {
         val factory = MyViewModelFactory(level!!)
         gameViewModel = ViewModelProvider(this, factory)[GameViewModel::class.java]
         topTenViewModel = ViewModelProvider(this)[TopTenViewModel::class.java]
-        gameViewModel.getCards()
 
-
-
-        gameViewModel.cards.observe(this){
-
-            println(it)
-            initUI(level.toInt())
-
-            gameViewModel.runTimer()
-
+        if (Network.isNetworkAvailable(this)) {
+            gameViewModel.getCardsFromApi()
         }
+        initUI(level.toInt())
+        gameViewModel.runTimer()
+
+
 
         gameViewModel.cardIdChanged.observe(this) {
             revealCard(it)
@@ -113,7 +110,10 @@ class GameActivity : AppCompatActivity() {
         scoreTV.text = getString(R.string.score, gameViewModel.gameManager.value?.getScore())
 
         submitBtn.setOnClickListener {
-            val user = User(nameET.text.toString(), scoreTV.text.toString())
+            val user = User(
+                nameET.text.toString(),
+                (scoreTV.text.removePrefix("Score: ") as String).toInt()
+            )
             topTenViewModel.saveUser(user)
             dialog.dismiss()
             finish()
@@ -148,7 +148,7 @@ class GameActivity : AppCompatActivity() {
     private fun revealCard(cardId: Int) {
         blockClick(cardId)
         val currentCard = findViewById<ImageView>(cardId)
-        revealCardAnimate(currentCard)
+        revealCardAnimate(currentCard, this)
         if (cardsFlippedCounter >= 2) {
             Handler(Looper.getMainLooper()).postDelayed({
                 gameViewModel.checkMatch()
@@ -183,11 +183,10 @@ class GameActivity : AppCompatActivity() {
 
     }
 
-    private fun revealCardAnimate(currentCard: ImageView) {
+    private fun revealCardAnimate(currentCard: ImageView, context: Context) {
 
         val anime1 = initAnimation(currentCard, 1f, 0f)
         val anime2 = initAnimation(currentCard, 0f, 1f)
-        val context=this
         anime1.addListener(object : AnimatorListenerAdapter() {
 
             override fun onAnimationEnd(animation: Animator) {
@@ -195,35 +194,53 @@ class GameActivity : AppCompatActivity() {
                 super.onAnimationEnd(animation)
                 anime2.start()
                 currentCard.setImageResource(R.drawable.back)
-                val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(bitmap)
-                var paint= Paint()
 
-                paint.color= Color.WHITE
-                paint.style = Paint.Style.FILL
-                canvas.drawRect(RectF(15F, 0f, 85f, 500f),paint)
+                if (Network.isNetworkAvailable(context)) {
+                    drawContent(currentCard)
 
-                paint.color= Color.BLACK
-                paint.style = Paint.Style.FILL
-                paint.textSize= 30f
-                val text= gameViewModel.gameManager.value!!.cardsMap[currentCard.id.toString()]?.content!!
-                canvas.drawText(text, 35f, 60f,paint)
-                currentCard.setImageBitmap(bitmap)
+                } else {
+                    setImage(currentCard)
+                }
 
-
-
-                /*currentCard.setImageResource(
-                    cardsImages.getResourceId(
-                        cardsImages.getIndex(
-                            gameViewModel.gameManager.value!!.cardsMap[currentCard.id.toString()]?.content!!.toInt()
-                        ), 0
-                    )
-                )*/
 
             }
         })
         anime1.start()
     }
+
+    private fun setImage(currentCard: ImageView) {
+        currentCard.setImageResource(
+            cardsImages.getResourceId(
+                cardsImages.getIndex(
+                    gameViewModel.gameManager.value!!.cardsMap[currentCard.id.toString()]?.content!!.toInt()
+                ), 0
+            )
+        )
+    }
+
+    private fun drawContent(currentCard: ImageView) {
+        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.LINEAR_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG)
+
+        paint.color = Color.WHITE
+        canvas.drawRect(RectF(15F, 0f, 85f, 500f), paint)
+
+        paint.apply {
+            this.color = Color.BLACK
+            this.textSize = 35f
+            this.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
+        }
+        val text =
+            gameViewModel.gameManager.value!!.cardsMap[currentCard.id.toString()]?.content!!
+        if (text.contains(".")) {
+            canvas.drawText(text.split(".")[0], 40f, 60f, paint)
+
+        } else
+            canvas.drawText(text, 40f, 60f, paint)
+        currentCard.setImageBitmap(bitmap)
+    }
+
 
     private fun flipBackCardAnimate(currentCard: ImageView) {
 

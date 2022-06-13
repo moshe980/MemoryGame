@@ -17,4 +17,8 @@ class TopTenViewModel : ViewModel() {
         userDao.saveUser(user)
     }
     fun getUsers()=userDao.getUsers()
+
+    fun clearUsers(){
+        userDao.clear()
+    }
 }

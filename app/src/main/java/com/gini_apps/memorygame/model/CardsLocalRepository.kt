@@ -4,7 +4,7 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.gini_apps.memorygame.model.entity.Card
 
-class CardsLocalRepository(var level: Int) :CardDao {
+class CardsLocalRepository(var level: Int) : CardDao {
 
     private var cardsMap = mutableMapOf<String, Card<String>>()
 
@@ -17,6 +17,11 @@ class CardsLocalRepository(var level: Int) :CardDao {
             }
 
         }
+        shuffle()
+
+    }
+
+    private fun shuffle() {
         val keys = cardsMap.keys.toMutableList().shuffled()
         val values = cardsMap.values.toMutableList().shuffled()
 
@@ -26,12 +31,11 @@ class CardsLocalRepository(var level: Int) :CardDao {
 
 
         }
-
     }
 
-    override  fun getCards(): MutableLiveData<Map<String, Card<String>>> {
+    override fun getCards(): MutableLiveData<MutableMap<String, Card<String>>> {
         setCards()
-        val data = MutableLiveData<Map<String, Card<String>>>()
+        val data = MutableLiveData<MutableMap<String, Card<String>>>()
         data.value = cardsMap
         return data
     }

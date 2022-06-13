@@ -9,66 +9,49 @@ import com.gini_apps.memorygame.model.CardsLocalRepository
 import com.gini_apps.memorygame.model.CardsService
 import com.gini_apps.memorygame.model.entity.Card
 import com.gini_apps.memorygame.model.GameManager
-import com.gini_apps.memorygame.model.entity.NumbersJson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.gini_apps.memorygame.model.entity.Contents
 import kotlinx.coroutines.launch
 
-class GameViewModel(val myParm: String) : ViewModel() {
+class GameViewModel(private val myParm: String) : ViewModel() {
     private var _gameManager: MutableLiveData<GameManager>
     var cardIdChanged = MutableLiveData<Int>()
-    var cards = MutableLiveData<Map<String, Card<String>>>()
     var cardsChanged = MutableLiveData<MutableMap<String, Card<String>>>()
     val gameManager get() = _gameManager
-    //private val cardDao: CardDao
+    private val cardDao: CardDao
 
     init {
+        val gameData = MutableLiveData<GameManager>()
 
-        //cardDao = CardsLocalRepository(myParm.toInt())
-        val cardsMap = mutableMapOf<String, Card<String>>()
-        val data = MutableLiveData<GameManager>()
-        viewModelScope.launch {
-            val numbersJson: NumbersJson? = CardsService.getInstance().getNumbers().body()
-            if (numbersJson != null) {
-                var numbers = numbersJson.numbers
-                for (i in 0 until myParm.toInt() * 2) {
-                    val id = View.generateViewId().toString()
-                    cardsMap[id] = Card(id, "${numbers[i].number}")
+        cardDao = CardsLocalRepository(myParm.toInt())
+        gameData.value = GameManager(cardDao.getCards().value!!, listener = {
+            runTimer()
+        })
 
-                }
-                data.value = GameManager(cardsMap!!, listener = {
-                    runTimer()
-                })
+        _gameManager = gameData
 
-
-
-
-            }
-        }
-        _gameManager = data
 
     }
 
-    fun getCards() {
+    fun getCardsFromApi() {
         val cardsMap = mutableMapOf<String, Card<String>>()
-        val data = MutableLiveData<Map<String, Card<String>>>()
+
         viewModelScope.launch {
-            val numbersJson: NumbersJson? = CardsService.getInstance().getNumbers().body()
-            if (numbersJson != null) {
-                var numbers = numbersJson.numbers
+            val numbersJson: Contents? = CardsService.getInstance().getLetters().body()
+            numbersJson?.let {
+                val contents = it.contents
                 for (i in 0 until myParm.toInt() * 2) {
                     val id = View.generateViewId().toString()
-                    cardsMap[id] = Card(id, "${numbers[i].number}")
+                    cardsMap["${i+1}"] = Card(id, "${contents[i].content}")
 
                 }
-                GameManager(cardsMap, listener = {
-                    runTimer()
-                })
-                data.value = cardsMap
+                val keys = cardsMap.keys.toMutableList().shuffled()
+                val values = cardsMap.values.toMutableList().shuffled()
 
-                cards.postValue(data.value)
+                keys.forEachIndexed { index, key ->
+                    cardsMap[key] = values[index]
+                }
 
-
+                _gameManager.value?.setCards(cardsMap)
             }
         }
 

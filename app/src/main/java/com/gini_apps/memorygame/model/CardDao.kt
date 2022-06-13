@@ -4,5 +4,5 @@ import androidx.lifecycle.MutableLiveData
 import com.gini_apps.memorygame.model.entity.Card
 
 interface CardDao {
-   fun getCards(): MutableLiveData<Map<String, Card<String>>>
+   fun getCards(): MutableLiveData<MutableMap<String, Card<String>>>
 }

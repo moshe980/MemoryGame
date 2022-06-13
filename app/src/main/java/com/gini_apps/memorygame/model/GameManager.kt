@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
-class GameManager(val cardsMap: Map<String, Card<String>>, val listener: OnTimerChangedListener) {
+class GameManager(var cardsMap: MutableMap<String, Card<String>>, val listener: OnTimerChangedListener) {
     var moveCounter = 2*cardsMap.size
     var firstCardFlippedIndex: String? = null
     var secondCardFlippedIndex: String? = null
@@ -19,12 +19,17 @@ class GameManager(val cardsMap: Map<String, Card<String>>, val listener: OnTimer
         start()
     }
 
+    fun setCards( mCardsMap: Map<String, Card<String>>){
+        cardsMap.clear()
+        cardsMap.putAll(mCardsMap)
+    }
+
     fun start() {
         executor= Executors.newSingleThreadScheduledExecutor()
         matchCounter = 0
         isGameOver = false
         timer = 0.0
-        moveCounter = 2
+        moveCounter = 2*cardsMap.size
         firstCardFlippedIndex = null
         secondCardFlippedIndex = null
         runTimer()
