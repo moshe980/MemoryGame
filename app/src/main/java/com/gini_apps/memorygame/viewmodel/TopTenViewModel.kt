@@ -1,7 +1,7 @@
-package com.gini_apps.memorygame.viewModel
+package com.gini_apps.memorygame.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.gini_apps.memorygame.model.UserDao
+import com.gini_apps.memorygame.model.dal.UserDao
 import com.gini_apps.memorygame.model.UserSpRepository
 import com.gini_apps.memorygame.model.entity.User
 

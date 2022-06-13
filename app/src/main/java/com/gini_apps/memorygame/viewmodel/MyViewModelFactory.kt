@@ -1,4 +1,4 @@
-package com.gini_apps.memorygame.viewModel
+package com.gini_apps.memorygame.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

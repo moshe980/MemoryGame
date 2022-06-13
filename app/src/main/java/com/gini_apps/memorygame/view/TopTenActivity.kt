@@ -1,15 +1,11 @@
 package com.gini_apps.memorygame.view
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.memorygame.databinding.ActivityTopTenBinding
 import com.gini_apps.memorygame.model.entity.User
-import com.gini_apps.memorygame.viewModel.GameViewModel
-import com.gini_apps.memorygame.viewModel.MyViewModelFactory
-import com.gini_apps.memorygame.viewModel.TopTenViewModel
+import com.gini_apps.memorygame.viewmodel.TopTenViewModel
 import com.google.gson.Gson
 
 class TopTenActivity : AppCompatActivity() {

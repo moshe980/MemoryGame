@@ -1,4 +1,4 @@
-package com.gini_apps.memorygame.model
+package com.gini_apps.memorygame.model.dal
 
 import com.gini_apps.memorygame.model.entity.User
 

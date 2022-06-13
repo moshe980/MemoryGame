@@ -1,4 +1,4 @@
-package com.gini_apps.memorygame
+package com.gini_apps.memorygame.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

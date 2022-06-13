@@ -19,11 +19,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.memorygame.R
 import com.example.memorygame.databinding.ActivityGameBinding
-import com.gini_apps.memorygame.Network
+import com.gini_apps.memorygame.utils.Network
 import com.gini_apps.memorygame.model.entity.User
-import com.gini_apps.memorygame.viewModel.GameViewModel
-import com.gini_apps.memorygame.viewModel.MyViewModelFactory
-import com.gini_apps.memorygame.viewModel.TopTenViewModel
+import com.gini_apps.memorygame.viewmodel.GameViewModel
+import com.gini_apps.memorygame.viewmodel.MyViewModelFactory
+import com.gini_apps.memorygame.viewmodel.TopTenViewModel
 
 
 class GameActivity : AppCompatActivity() {
@@ -229,7 +229,7 @@ class GameActivity : AppCompatActivity() {
         paint.apply {
             this.color = Color.BLACK
             this.textSize = 35f
-            this.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
+            this.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
         val text =
             gameViewModel.gameManager.value!!.cardsMap[currentCard.id.toString()]?.content!!

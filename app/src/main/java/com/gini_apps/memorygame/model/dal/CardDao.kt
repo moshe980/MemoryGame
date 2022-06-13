@@ -1,4 +1,4 @@
-package com.gini_apps.memorygame.model
+package com.gini_apps.memorygame.model.dal
 
 import androidx.lifecycle.MutableLiveData
 import com.gini_apps.memorygame.model.entity.Card

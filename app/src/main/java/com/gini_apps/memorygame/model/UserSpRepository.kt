@@ -2,6 +2,7 @@ package com.gini_apps.memorygame.model
 
 import android.content.Context
 import com.gini_apps.memorygame.MyApplication.Companion.appContext
+import com.gini_apps.memorygame.model.dal.UserDao
 import com.gini_apps.memorygame.model.entity.User
 import com.google.gson.Gson
 import java.lang.ref.WeakReference

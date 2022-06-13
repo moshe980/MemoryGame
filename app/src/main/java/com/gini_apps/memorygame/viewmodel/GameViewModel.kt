@@ -1,12 +1,12 @@
-package com.gini_apps.memorygame.viewModel
+package com.gini_apps.memorygame.viewmodel
 
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gini_apps.memorygame.model.CardDao
-import com.gini_apps.memorygame.model.CardsLocalRepository
-import com.gini_apps.memorygame.model.CardsService
+import com.gini_apps.memorygame.model.dal.CardDao
+import com.gini_apps.memorygame.model.dal.CardsLocalRepository
+import com.gini_apps.memorygame.model.dal.CardsService
 import com.gini_apps.memorygame.model.entity.Card
 import com.gini_apps.memorygame.model.GameManager
 import com.gini_apps.memorygame.model.entity.Contents
@@ -36,7 +36,7 @@ class GameViewModel(private val myParm: String) : ViewModel() {
         val cardsMap = mutableMapOf<String, Card<String>>()
 
         viewModelScope.launch {
-            val numbersJson: Contents? = CardsService.getInstance().getLetters().body()
+            val numbersJson: Contents? = CardsService.getInstance().getNumbers().body()
             numbersJson?.let {
                 val contents = it.contents
                 for (i in 0 until myParm.toInt() * 2) {

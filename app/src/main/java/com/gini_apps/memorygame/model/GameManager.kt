@@ -17,6 +17,7 @@ class GameManager(var cardsMap: MutableMap<String, Card<String>>, val listener: 
 
     init {
         start()
+        
     }
 
     fun setCards( mCardsMap: Map<String, Card<String>>){
